@@ -51,7 +51,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50, verbose_name='first name')
     last_name = models.CharField(max_length=50, verbose_name='last name')
     date_of_birth = models.DateField(verbose_name='date of birth')
-    image = models.ImageField(default='users/image_user.jpg', upload_to='users/', blank=True, null=True, verbose_name='profile image')
+    image = models.ImageField(upload_to='users/', blank=True, null=True, verbose_name='profile image')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='creation date')
 
     # Status Flags
@@ -64,7 +64,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     # Custom authentication settings
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth', 'image']
 
     # Methods
     def get_full_name(self):

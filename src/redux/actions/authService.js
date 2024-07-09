@@ -14,25 +14,25 @@ const API_URL = process.env.REACT_APP_API_URL;
  * @throws {Error} If an invalid header configuration type is provided.
  */
 const createHeadersConfig = (type, token = null) => {
-	const config = {
-		headers: {},
-	};
+    const config = {
+        headers: {},
+    };
 
-	switch (type) {
-		case 'json':
-			config.headers['Content-Type'] = 'application/json';
-			if (token) config.headers['Authorization'] = `JWT ${token}`;
-			break;
-		case 'multipart':
-			config.headers['Content-Type'] = 'multipart/form-data';
-			break;
-		default:
-			throw new Error(
-				`Tipo de configuración de encabezados no válido: ${type}`
-			);
-	}
+    switch (type) {
+        case 'json':
+            config.headers['Content-Type'] = 'application/json';
+            if (token) config.headers['Authorization'] = `JWT ${token}`;
+            break;
+        case 'multipart':
+            config.headers['Content-Type'] = 'multipart/form-data';
+            break;
+        default:
+            throw new Error(
+                `Tipo de configuración de encabezados no válido: ${type}`
+            );
+    }
 
-	return config;
+    return config;
 };
 
 /**
@@ -41,11 +41,11 @@ const createHeadersConfig = (type, token = null) => {
  * @returns {FormData} FormData object populated with key-value pairs.
  */
 const createFormData = (formDataFields) => {
-	const formData = new FormData();
-	Object.entries(formDataFields).forEach(([key, value]) => {
-		formData.append(key, value);
-	});
-	return formData;
+    const formData = new FormData();
+    Object.entries(formDataFields).forEach(([key, value]) => {
+        formData.append(key, value);
+    });
+    return formData;
 };
 
 /**
@@ -57,18 +57,18 @@ const createFormData = (formDataFields) => {
  * - Other specific error information in case of failure.
  */
 async function createJWT({ email, password }) {
-	const config = createHeadersConfig('json');
+    const config = createHeadersConfig('json');
 
-	const body = JSON.stringify({ email, password });
+    const body = JSON.stringify({ email, password });
 
-	try {
-		const response = await axios.post(`${API_URL}/jwt/create/`, body, config);
-		const { access, refresh } = response.data;
-		return { created: true, access, refresh };
-	} catch (error) {
-		const response = error.response;
-		return { created: false, ...(response ? response.data : {}) };
-	}
+    try {
+        const response = await axios.post(`${API_URL}/jwt/create/`, body, config);
+        const { access, refresh } = response.data;
+        return { created: true, access, refresh };
+    } catch (error) {
+        const response = error.response;
+        return { created: false, ...(response ? response.data : {}) };
+    }
 }
 
 /**
@@ -79,18 +79,18 @@ async function createJWT({ email, password }) {
  * - Other specific error information in case of failure.
  */
 async function refreshJWT(refreshToken) {
-	const config = createHeadersConfig('json');
+    const config = createHeadersConfig('json');
 
-	const body = JSON.stringify({ refresh: refreshToken });
+    const body = JSON.stringify({ refresh: refreshToken });
 
-	try {
-		const response = await axios.post(`${API_URL}/jwt/refresh/`, body, config);
-		const { access } = response.data;
-		return { refreshed: true, access };
-	} catch (error) {
-		const response = error.response;
-		return { refreshed: false, ...(response ? response.data : {}) };
-	}
+    try {
+        const response = await axios.post(`${API_URL}/jwt/refresh/`, body, config);
+        const { access } = response.data;
+        return { refreshed: true, access };
+    } catch (error) {
+        const response = error.response;
+        return { refreshed: false, ...(response ? response.data : {}) };
+    }
 }
 
 /**
@@ -100,17 +100,17 @@ async function refreshJWT(refreshToken) {
  * - Other specific error information in case of failure.
  */
 async function verifyJWT(accessToken) {
-	const config = createHeadersConfig('json');
+    const config = createHeadersConfig('json');
 
-	const body = JSON.stringify({ token: accessToken });
+    const body = JSON.stringify({ token: accessToken });
 
-	try {
-		await axios.post(`${API_URL}/jwt/verify/`, body, config);
-		return { verified: true };
-	} catch (error) {
-		const response = error.response;
-		return { verified: false, ...(response ? response.data : {}) };
-	}
+    try {
+        await axios.post(`${API_URL}/jwt/verify/`, body, config);
+        return { verified: true };
+    } catch (error) {
+        const response = error.response;
+        return { verified: false, ...(response ? response.data : {}) };
+    }
 }
 
 /**
@@ -120,15 +120,15 @@ async function verifyJWT(accessToken) {
  * - Other specific error information in case of failure.
  */
 async function getUser(accessToken) {
-	const config = createHeadersConfig('json', accessToken);
+    const config = createHeadersConfig('json', accessToken);
 
-	try {
-		const response = await axios.get(`${API_URL}/users/me/`, config);
-		return { user: response.data };
-	} catch (error) {
-		const response = error.response;
-		return { user: null, ...(response ? response.data : {}) };
-	}
+    try {
+        const response = await axios.get(`${API_URL}/users/me/`, config);
+        return { user: response.data };
+    } catch (error) {
+        const response = error.response;
+        return { user: null, ...(response ? response.data : {}) };
+    }
 }
 
 /**
@@ -139,35 +139,35 @@ async function getUser(accessToken) {
  * - Other specific error information in case of failure.
  */
 async function createUser({
-	email,
-	first_name,
-	last_name,
-	date_of_birth,
-	password,
-	re_password,
-	image,
+    email,
+    first_name,
+    last_name,
+    date_of_birth,
+    password,
+    re_password,
+    image,
 }) {
-	const config = createHeadersConfig('multipart');
+    const config = createHeadersConfig('multipart');
 
-	const formData = createFormData({
-		email,
-		first_name,
-		last_name,
-		date_of_birth,
-		password,
-		re_password,
-	});
-	const imageExtension = image.name.split('.').pop();
-	const imageName = `${email}_profile_image.${imageExtension}`;
-	formData.append('image', image, imageName);
+    const formData = createFormData({
+        email,
+        first_name,
+        last_name,
+        date_of_birth,
+        password,
+        re_password,
+    });
+    const imageExtension = image.name.split('.').pop();
+    const imageName = `${email}_profile_image.${imageExtension}`;
+    formData.append('image', image, imageName);
 
-	try {
-		const response = await axios.post(`${API_URL}/users/`, formData, config);
-		return { registered: true, user: response.data };
-	} catch (error) {
-		const response = error.response;
-		return { registered: false, ...(response ? response.data : {}) };
-	}
+    try {
+        const response = await axios.post(`${API_URL}/users/`, formData, config);
+        return { registered: true, user: response.data };
+    } catch (error) {
+        const response = error.response;
+        return { registered: false, ...(response ? response.data : {}) };
+    }
 }
 
 /**
@@ -178,25 +178,25 @@ async function createUser({
  * - Other specific error information in case of failure.
  */
 async function activateUser({ uid, token }) {
-	const config = createHeadersConfig('json');
+    const config = createHeadersConfig('json');
 
-	const body = JSON.stringify({ uid, token });
+    const body = JSON.stringify({ uid, token });
 
-	try {
-		await axios.post(`${API_URL}/users/activation/`, body, config);
-		return { activated: true };
-	} catch (error) {
-		const response = error.response;
+    try {
+        await axios.post(`${API_URL}/users/activation/`, body, config);
+        return { activated: true };
+    } catch (error) {
+        const response = error.response;
 
-		if (response.status === HttpStatusCode.Forbidden)
-			return {
-				activated: false,
-				alreadyActive: true,
-				...(response ? response.data : {}),
-			};
-		else
-			return { activated: false, ...(response ? response.data : {}) };
-	}
+        if (response.status === HttpStatusCode.Forbidden)
+            return {
+                activated: false,
+                alreadyActive: true,
+                ...(response ? response.data : {}),
+            };
+        else
+            return { activated: false, ...(response ? response.data : {}) };
+    }
 }
 
 /**
@@ -206,16 +206,16 @@ async function activateUser({ uid, token }) {
  * - Other specific error information in case of failure.
  */
 async function resendActivationEmail(email) {
-	const config = createHeadersConfig('json');
+    const config = createHeadersConfig('json');
 
-	const body = JSON.stringify({ email: email });
-	try {
-		await axios.post(`${API_URL}/users/resend_activation/`, body, config);
-		return { success: true };
-	} catch (error) {
-		const response = error.response;
-		return { success: false, ...(response ? response.data : {}) };
-	}
+    const body = JSON.stringify({ email: email });
+    try {
+        await axios.post(`${API_URL}/users/resend_activation/`, body, config);
+        return { success: true };
+    } catch (error) {
+        const response = error.response;
+        return { success: false, ...(response ? response.data : {}) };
+    }
 }
 
 /**
@@ -225,16 +225,16 @@ async function resendActivationEmail(email) {
  * - Other specific error information in case of failure.
  */
 async function sendPasswordResetEmail(email) {
-	const config = createHeadersConfig('json');
+    const config = createHeadersConfig('json');
 
-	const body = JSON.stringify({ email: email });
-	try {
-		await axios.post(`${API_URL}/users/reset_password/`, body, config);
-		return { success: true };
-	} catch (error) {
-		const response = error.response;
-		return { success: false, ...(response ? response.data : {}) };
-	}
+    const body = JSON.stringify({ email: email });
+    try {
+        await axios.post(`${API_URL}/users/reset_password/`, body, config);
+        return { success: true };
+    } catch (error) {
+        const response = error.response;
+        return { success: false, ...(response ? response.data : {}) };
+    }
 }
 
 /**
@@ -244,41 +244,41 @@ async function sendPasswordResetEmail(email) {
  * - Other specific error information in case of failure.
  */
 async function confirmResetPassword({
-	uid,
-	token,
-	new_password,
-	re_new_password,
+    uid,
+    token,
+    new_password,
+    re_new_password,
 }) {
-	const config = createHeadersConfig('json');
+    const config = createHeadersConfig('json');
 
-	const body = JSON.stringify({
-		uid,
-		token,
-		new_password,
-		re_new_password,
-	});
-	try {
-		await axios.post(`${API_URL}/users/reset_password_confirm/`, body, config);
-		return { changed: true };
-	} catch (error) {
-		const response = error.response;
-		return { changed: false, ...(response ? response.data : {}) };
-	}
+    const body = JSON.stringify({
+        uid,
+        token,
+        new_password,
+        re_new_password,
+    });
+    try {
+        await axios.post(`${API_URL}/users/reset_password_confirm/`, body, config);
+        return { changed: true };
+    } catch (error) {
+        const response = error.response;
+        return { changed: false, ...(response ? response.data : {}) };
+    }
 }
 
 /**
  * Object containing various authentication-related API functions.
  */
 const authAPI = {
-	createJWT,
-	refreshJWT,
-	verifyJWT,
-	getUser,
-	activateUser,
-	resendActivationEmail,
-	createUser,
-	sendPasswordResetEmail,
-	confirmResetPassword,
+    createJWT,
+    refreshJWT,
+    verifyJWT,
+    getUser,
+    activateUser,
+    resendActivationEmail,
+    createUser,
+    sendPasswordResetEmail,
+    confirmResetPassword,
 };
 
 export default authAPI;

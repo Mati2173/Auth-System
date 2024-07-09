@@ -42,7 +42,7 @@ const createHeadersConfig = (type, token = null) => {
  */
 const createFormData = (formDataFields) => {
 	const formData = new FormData();
-	formDataFields.forEach(([key, value]) => {
+	Object.entries(formDataFields).forEach(([key, value]) => {
 		formData.append(key, value);
 	});
 	return formData;
@@ -67,7 +67,7 @@ async function createJWT({ email, password }) {
 		return { created: true, access, refresh };
 	} catch (error) {
 		const response = error.response;
-		return { created: false, ...response.data };
+		return { created: false, ...(response ? response.data : {}) };
 	}
 }
 
@@ -89,7 +89,7 @@ async function refreshJWT(refreshToken) {
 		return { refreshed: true, access };
 	} catch (error) {
 		const response = error.response;
-		return { refreshed: false, ...response.data };
+		return { refreshed: false, ...(response ? response.data : {}) };
 	}
 }
 
@@ -102,14 +102,14 @@ async function refreshJWT(refreshToken) {
 async function verifyJWT(accessToken) {
 	const config = createHeadersConfig('json');
 
-	const body = JSON.stringify({ access: accessToken });
+	const body = JSON.stringify({ token: accessToken });
 
 	try {
 		await axios.post(`${API_URL}/jwt/verify/`, body, config);
 		return { verified: true };
 	} catch (error) {
 		const response = error.response;
-		return { verified: false, ...response.data };
+		return { verified: false, ...(response ? response.data : {}) };
 	}
 }
 
@@ -127,7 +127,7 @@ async function getUser(accessToken) {
 		return { user: response.data };
 	} catch (error) {
 		const response = error.response;
-		return { user: null, ...response.data };
+		return { user: null, ...(response ? response.data : {}) };
 	}
 }
 
@@ -156,15 +156,17 @@ async function createUser({
 		date_of_birth,
 		password,
 		re_password,
-		image,
 	});
+	const imageExtension = image.name.split('.').pop();
+	const imageName = `${email}_profile_image.${imageExtension}`;
+	formData.append('image', image, imageName);
 
 	try {
 		const response = await axios.post(`${API_URL}/users/`, formData, config);
 		return { registered: true, user: response.data };
 	} catch (error) {
 		const response = error.response;
-		return { registered: false, ...response.data };
+		return { registered: false, ...(response ? response.data : {}) };
 	}
 }
 
@@ -187,8 +189,13 @@ async function activateUser({ uid, token }) {
 		const response = error.response;
 
 		if (response.status === HttpStatusCode.Forbidden)
-			return { activated: false, alreadyActive: true, ...response.data };
-		else return { activated: false, ...response.data };
+			return {
+				activated: false,
+				alreadyActive: true,
+				...(response ? response.data : {}),
+			};
+		else
+			return { activated: false, ...(response ? response.data : {}) };
 	}
 }
 
@@ -207,7 +214,7 @@ async function resendActivationEmail(email) {
 		return { success: true };
 	} catch (error) {
 		const response = error.response;
-		return { success: false, ...response.data };
+		return { success: false, ...(response ? response.data : {}) };
 	}
 }
 
@@ -226,7 +233,7 @@ async function sendPasswordResetEmail(email) {
 		return { success: true };
 	} catch (error) {
 		const response = error.response;
-		return { success: false, ...response.data };
+		return { success: false, ...(response ? response.data : {}) };
 	}
 }
 
@@ -255,7 +262,7 @@ async function confirmResetPassword({
 		return { changed: true };
 	} catch (error) {
 		const response = error.response;
-		return { changed: false, ...response.data };
+		return { changed: false, ...(response ? response.data : {}) };
 	}
 }
 

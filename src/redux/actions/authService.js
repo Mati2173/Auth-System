@@ -132,6 +132,24 @@ async function getUser(accessToken) {
 }
 
 /**
+ * Retrieves all users information using a JWT access token.
+ * @returns {Object} Object with users information fetched from the backend.
+ * - `users`: Array of objects, each containing user data.
+ * - Other specific error information in case of failure.
+ */
+async function getAllUsers(accessToken) {
+    const config = createHeadersConfig('json', accessToken);
+
+    try {
+        const response = await axios.get(`${API_URL}/users/`, config);
+        return { users: response.data };
+    } catch (error) {
+        const response = error.response;
+        return { users: [], ...(response ? response.data : {}) };
+    }
+}
+
+/**
  * Creates a new user by sending data to the backend.
  * @returns {Object} Object with information about registration result.
  * - `registered`: true if registration was successful, false if there was an error.
@@ -274,6 +292,7 @@ const authAPI = {
     refreshJWT,
     verifyJWT,
     getUser,
+    getAllUsers,
     activateUser,
     resendActivationEmail,
     createUser,

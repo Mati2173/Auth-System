@@ -6,8 +6,8 @@ import {
 } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { classNames } from '../helpers'
+import { Link, useLocation } from 'react-router-dom';
+import { classNames } from '../helpers';
 import logo from '../assets/img/logo.png';
 
 const guestLinks = [
@@ -31,13 +31,20 @@ const userStaffLinks = [
 ];
 
 export default function Navbar() {
-    const { isAuthenticated, is_staff } = useSelector((state) => state.auth);
+    const { isAuthenticated, isStaff } = useSelector((state) => state.auth);
+    const location = useLocation();
 
-    let navigation = isAuthenticated ? userLinks : guestLinks;
+    let navigation;
 
-    if (isAuthenticated && is_staff) {
-        navigation = userStaffLinks;
-    }
+    if (!isAuthenticated) navigation = guestLinks;
+    else if (!isStaff) navigation = userLinks;
+    else navigation = userStaffLinks;
+
+
+    navigation = navigation.map((item) => ({
+        ...item,
+        current: item.to === location.pathname,
+    }));
 
     return (
         <Disclosure as="nav" className="bg-white border-b-2 border-blue-100">
